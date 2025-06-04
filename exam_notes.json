@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "heading": "Mean Value Theorem",
+    "summary": "The Mean Value Theorem states that for a continuous and differentiable function, there exists at least one point where the derivative equals the avera",
+    "page_ref": 17
+  },
+  {
+    "id": 2,
+    "heading": "Fundamental Theorem of Calculus",
+    "summary": "This theorem links the concept of differentiation and integration, stating that the integral of a function over an interval can be computed using its ",
+    "page_ref": 64
+  },
+  {
+    "id": 3,
+    "heading": "Limits and Continuity",
+    "summary": "Limits describe the behavior of functions as inputs approach a point. Continuity ensures that a function behaves predictably and has no breaks or jump",
+    "page_ref": 17
+  },
+  {
+    "id": 4,
+    "heading": "Product, Quotient, and Chain Rules",
+    "summary": "These rules simplify differentiation. Product Rule: Derivative of product of two functions. Quotient Rule: Derivative of a ratio. Chain Rule: Derivati",
+    "page_ref": 31
+  },
+  {
+    "id": 5,
+    "heading": "Integration Techniques",
+    "summary": "Important techniques include substitution and integration by parts, essential for finding antiderivatives of complex functions.",
+    "page_ref": 62
+  },
+  {
+    "id": 6,
+    "heading": "Taylor and Maclaurin Series",
+    "summary": "These series approximate functions using polynomials. Maclaurin is a special case of Taylor series centered at zero.",
+    "page_ref": 48
+  },
+  {
+    "id": 7,
+    "heading": "Partial Derivatives",
+    "summary": "Partial derivatives measure how functions change as each variable changes, holding others constant, important for multivariate functions.",
+    "page_ref": 72
+  },
+  {
+    "id": 8,
+    "heading": "Multiple Integrals",
+    "summary": "Extend the concept of integration to functions of multiple variables, used to compute volumes under surfaces.",
+    "page_ref": 80
+  },
+  {
+    "id": 9,
+    "heading": "Derivatives and Applications",
+    "summary": "Derivatives convey rates of change, crucial for understanding motion, growth, and decay across various disciplines.",
+    "page_ref": 34
+  },
+  {
+    "id": 10,
+    "heading": "Series and Sequences",
+    "summary": "Study the behavior of sequences and the convergence of series, fundamental for understanding complex functions.",
+    "page_ref": 50
+  }
+]
