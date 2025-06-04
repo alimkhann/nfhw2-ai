@@ -1,126 +1,118 @@
-# OpenAI Practice Lab
+# AI Homework Jun 3
 
-A comprehensive 2-hour hands-on learning experience with OpenAI's Assistant API, featuring structured outputs, RAG with built-in `file_search`, and practical Python implementations.
+## Objective
 
-## Quick Start
-
-1. **Clone and setup**:
-
-   ```bash
-   git clone <your-repo-url>
-   cd openai-practice-lab
-   pip install -r requirements.txt
-   ```
-
-2. **Configure API access**:
-
-   ```bash
-   cp .env.example .env
-   # Edit .env with your OPENAI_API_KEY
-   ```
-
-3. **Run the labs**:
-   ```bash
-   python scripts/00_init_assistant.py      # Bootstrap assistant
-   python scripts/01_responses_api.py       # Threads → Runs → streaming
-   python scripts/02_structured_output.py   # JSON-mode + function tools
-   python scripts/03_rag_file_search.py     # End-to-end RAG
-   python scripts/99_cleanup.py            # Clean up resources
-   ```
-
-## Repository Structure
-
-```
-openai-practice-lab/
-│
-├─ README.md              # This file - Quick-start & roadmap
-├─ requirements.txt       # openai>=1.83.0, python-dotenv, pydantic, pytest
-├─ .env.example           # OPENAI_API_KEY, OPENAI_ORG (optional)
-│
-├─ scripts/
-│   ├─ 00_init_assistant.py      # Helper: creates or updates one reusable assistant
-│   ├─ 01_responses_api.py       # Walk-through of Threads → Runs → streaming
-│   ├─ 02_structured_output.py   # JSON-mode + function tools demo
-│   ├─ 03_rag_file_search.py     # End-to-end RAG with `file_search`
-│   └─ 99_cleanup.py            # Delete test threads, files, runs
-│
-├─ data/                         # Sample PDFs / Markdown to upload
-│
-└─ tests/
-    └─ test_runs.py              # pytest sanity checks (<5 min)
-```
-
-## 2-Hour Learning Roadmap
-
-| Time    | Action                                                    |
-| ------- | --------------------------------------------------------- |
-| 0-10    | Clone repo, `pip install -r requirements.txt`, set `.env` |
-| 10-30   | Run **00** + **01** (Responses API basics)                |
-| 30-50   | Run **02** (Structured Outputs)                           |
-| 50-80   | Run **03** (file_search RAG)                              |
-| 80-100  | Explore run logs, check `tests/`, tweak prompts           |
-| 100-120 | Read linked docs or extend scripts (e.g., add web search) |
-
-## Lab Modules
-
-### 00 — Assistant Bootstrap (5 min)
-
-Creates a reusable assistant with `file_search` capabilities and stores the `ASSISTANT_ID` locally.
-
-### 01 — Responses API Lab (≈ 20 min)
-
-- Create threads and append messages
-- Start runs with polling and streaming
-- Demonstrate tool calls with built-in tools
-- Download output files and log metrics
-
-### 02 — Structured Output Lab (≈ 20 min)
-
-- Guarantee JSON output matching Pydantic models
-- Compare JSON-mode vs function tools with `"strict": True`
-- Parse and validate structured responses
-- Unit testing for reliability
-
-### 03 — RAG via `file_search` Lab (≈ 30 min)
-
-- Upload documents for knowledge retrieval
-- Attach files to assistant's vector store
-- Query with automatic `file_search` invocation
-- Inspect citations and chunk references
-- Multi-file retrieval demonstration
-
-### 99 — Cleanup (1 min)
-
-Remove temporary resources to avoid quota bloat.
-
-## Key External References
-
-- **OpenAI Python SDK v1.83.0**: [GitHub Releases](https://github.com/openai/openai-python/releases)
-- **Responses API Reference**: https://platform.openai.com/docs/api-reference/responses
-- **Structured Output Guide**: https://platform.openai.com/docs/guides/structured-output
-- **File Search Tool**: https://platform.openai.com/docs/tools/file-search
-
-## Testing
-
-Run the test suite to verify everything works:
-
-```bash
-pytest tests/ -v
-```
-
-## Tips
-
-- Keep total file uploads < 100 MB to stay within free quota
-- Each script includes inline documentation links for deeper learning
-- All examples are production-ready and can be extended for real applications
-- Use `python scripts/99_cleanup.py` regularly to manage resources
-
-## Requirements
-
-- Python 3.8+
-- OpenAI API key with sufficient credits
-- Internet connection for API calls
+Learn the Assistants API (with built-in `file_search`) and Structured Output by building a mini AI tutor that pulls answers from uploaded study materials and then produces concise revision notes.
 
 ---
 
-**Everything can be run with** `python scripts/XX_script_name.py` — no Jupyter needed!
+## 📁 Repo scaffold
+
+```
+study-assistant-lab/
+├─ README.md
+├─ requirements.txt          # openai>=1.83.0, python-dotenv, pydantic
+├─ .env.example              # OPENAI_API_KEY
+├─ data/                     # place your PDF(s) here
+│   └─ calculus_basics.pdf
+├─ scripts/
+│   ├─ 00_bootstrap.py        # create/reuse assistant with file_search
+│   ├─ 01_qna_assistant.py    # Part 1 solution
+│   ├─ 02_generate_notes.py   # Part 2 solution
+│   └─ 99_cleanup.py
+└─ tests/
+    └─ test_notes_schema.py   # optional pytest validation
+```
+
+---
+
+## 🧠 Part 1 — Q\&A Assistant from PDFs (≈ 60 min)
+
+### Goal
+
+Build an assistant that answers study questions by retrieving passages from the uploaded PDF(s).
+
+### 1. Bootstrap the assistant (run `00_bootstrap.py`)
+
+```python
+assistant = client.assistants.create(
+    name="Study Q&A Assistant",
+    instructions=(
+        "You are a helpful tutor. "
+        "Use the knowledge in the attached files to answer questions. "
+        "Cite sources where possible."
+    ),
+    model="gpt-4o-mini",
+    tools=[{"type": "file_search"}]
+)
+```
+
+### 2. Upload one or more course PDFs
+
+```python
+file_id = client.files.create(
+    purpose="knowledge_retrieval",
+    file=open("data/calculus_basics.pdf", "rb")
+).id
+
+client.assistants.update(
+    assistant.id,
+    tool_resources={"file_search": {"vector_store_files": [file_id]}}
+)
+```
+
+### 3. Interact via threads (`01_qna_assistant.py`)
+
+Prompt examples to test:
+
+* “Explain the difference between a definite and an indefinite integral in one paragraph.”
+* “Give me the statement of the Mean Value Theorem.”
+
+👉 Stream the run; print both `answer` and the `citations` field to verify retrieval.
+
+### 4. ✅ Self-check
+
+Answer should reference at least one chunk ID from the PDF.
+
+---
+
+## ✍️ Part 2 — Generate 10 Exam Notes (≈ 45 min)
+
+### Goal
+
+Produce exactly ten bite-sized revision notes in JSON, enforcing a schema with Structured Output.
+
+### 1. Define a Pydantic schema
+
+```python
+from pydantic import BaseModel, Field
+
+class Note(BaseModel):
+    id: int = Field(..., ge=1, le=10)
+    heading: str = Field(..., example="Mean Value Theorem")
+    summary: str = Field(..., max_length=150)
+    page_ref: int | None = Field(None, description="Page number in source PDF")
+```
+
+### 2. Prompt in JSON-mode (`02_generate_notes.py`)
+
+```python
+system = (
+    "You are a study summarizer. "
+    "Return exactly 10 unique notes that will help prepare for the exam. "
+    "Respond *only* with valid JSON matching the Note[] schema."
+)
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "system", "content": system}],
+    response_format={"type": "json_object"}
+)
+
+data = json.loads(response.choices[0].message.content)
+notes = [Note(**item) for item in data["notes"]]  # will raise if invalid
+```
+
+### 3. Output
+
+Print pretty notes or save to `exam_notes.json`.
